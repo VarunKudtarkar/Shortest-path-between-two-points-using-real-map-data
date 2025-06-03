@@ -1,0 +1,47 @@
+#For extracting node data from box
+
+<query type="way" into="hw">
+  <has-kv k="highway"/>
+  <has-kv k="highway" modv="not" regv="footway|cycleway|path|service|track"/>
+  <bbox-query {{bbox}}/>
+</query>
+
+<foreach from="hw" into="w">
+  <recurse from="w" type="way-node" into="ns"/>
+  <recurse from="ns" type="node-way" into="w2"/>
+  <query type="way" into="w2">
+    <item set="w2"/>
+    <has-kv k="highway"/>
+    <has-kv k="highway" modv="not" regv="footway|cycleway|path|service|track"/>
+  </query>
+  <difference into="wd">
+    <item set="w2"/>
+    <item set="w"/>
+  </difference>
+  <recurse from="wd" type="way-node" into="n2"/>
+  <recurse from="w"  type="way-node" into="n3"/>
+  <query type="node">
+    <item set="n2"/>
+    <item set="n3"/>
+  </query>
+  <print/>
+</foreach>
+
+#For extracting ways data from bounding box
+
+<query type="way" into="hw">
+  <has-kv k="highway"/>
+  <has-kv k="highway" modv="not" regv="footway|cycleway|path|service|track"/>
+  <bbox-query {{bbox}}/>
+</query>
+
+<foreach from="hw" into="w">
+  <query type="way"> 
+      <item set="hw"/>
+  </query>
+  <union>
+    <item/>
+    <recurse type="down"/>
+  </union>
+  <print/>
+</foreach>
